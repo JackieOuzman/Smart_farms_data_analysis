@@ -67,13 +67,14 @@ Walpeup_drift_pts <- Walpeup %>% filter(GPS_Drift == "drift")
 ##################################################################################
 names(Walpeup)
 EM1VMean <- ggplot(Walpeup, aes(x=`EM_1m_PRED`, y=`mean.resistance.value.for.the.profile`)) + 
-  geom_point()+
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
   stat_regline_equation(
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  geom_point(data = Walpeup_drift_pts, colour = "red")+
+  geom_point(data = Walpeup_drift_pts, colour = "red", size=1.0)+
   labs(#title = "Walpeup EM vs penetrometer ",
                #subtitle = "",
                #x = "EM mS/m (depth 1meter)", 
@@ -92,35 +93,33 @@ ggsave(
 
 
 
-EM1VMean_sand <-Walpeup %>% filter(EM_1m_PRED < 10) %>% 
-  ggplot(aes(x=`EM_1m_PRED`, y=`mean.resistance.value.for.the.profile`)) + 
-  geom_point()+
-  geom_smooth(method = lm, se = FALSE) +
-  stat_regline_equation(
-    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-    formula = (y ~ x)
-  ) +
-  geom_point(data = Walpeup_drift_pts %>% filter(EM_1m_PRED < 10) , colour = "red")+
-  labs(#title = "Walpeup EM vs penetrometer - Sand only",
-       #subtitle = "",
-       x = "", 
-       #x = "EM mS/m (depth 0.5meter)", 
-       y = "Mean \nresistance"
-  )+
-  theme(panel.background = element_rect(fill = "#BFD5E3"))
-
-
-
-
-
-ggsave(
-  device = "png",
-  filename = "EM1VMean_sand.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
-  width=8.62,
-  height = 6.28,
-  dpi=600
-) 
+# EM1VMean_sand <- Walpeup %>% filter(EM_1m_PRED < 10) %>% 
+#   ggplot(aes(x=`EM_1m_PRED`, y=`mean.resistance.value.for.the.profile`)) + 
+#   geom_point()+
+#   geom_smooth(method = lm, se = FALSE) +
+#   stat_regline_equation(
+#     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+#     formula = (y ~ x)
+#   ) +
+#   geom_point(data = Walpeup_drift_pts %>% filter(EM_1m_PRED < 10) , colour = "red")+
+#   labs(#title = "Walpeup EM vs penetrometer - Sand only",
+#        #subtitle = "",
+#        x = "", 
+#        #x = "EM mS/m (depth 0.5meter)", 
+#        y = "Mean \nresistance"
+#   )+
+#   theme(panel.background = element_rect(fill = "#BFD5E3"))
+# 
+# 
+# 
+# ggsave(
+#   device = "png",
+#   filename = "EM1VMean_sand.png",
+#   path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
+#   width=8.62,
+#   height = 6.28,
+#   dpi=600
+# ) 
 
 
 
@@ -131,13 +130,14 @@ ggsave(
 
 names(Walpeup)
 EM1Vs_depth_exc2Mpa <- ggplot(Walpeup, aes(x=`EM_1m_PRED`, y=`The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm`)) + 
-  geom_point()+
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
   stat_regline_equation(
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  geom_point(data = Walpeup_drift_pts, colour = "red")+
+  geom_point(data = Walpeup_drift_pts, colour = "red", size=1.0)+
   labs(#title = "Walpeup EM vs penetrometer ",
        #subtitle = "",
        #x = "EM mS/m (depth 1meter)",
@@ -158,30 +158,30 @@ ggsave(
 ### #4b. "The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm" vs "EM_05m_PRE"    SAND
 
 
-EM1Vs_depth_exc2Mpa_sand <-Walpeup %>% filter(EM_1m_PRED < 10) %>% 
-  ggplot( aes(x=`EM_05m_PRE`, y=`The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm`)) + 
-  geom_point()+
-  geom_smooth(method = lm, se = FALSE) +
-  stat_regline_equation(
-    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-    formula = (y ~ x)
-  ) +
-  geom_point(data = Walpeup_drift_pts %>% filter(EM_1m_PRED < 10) , colour = "red")+
-  labs(#title = "Walpeup EM vs penetrometer sand ",
-       #subtitle = "",
-       #x = "EM mS/m (depth 1meter)", 
-       x = "",
-       y = "Depth exceedes \n2.5MPa"     )  +
-  theme(panel.background = element_rect(fill = "#BFD5E3"))
-
-ggsave(
-  device = "png",
-  filename = "EM1Vs_depth_exc2Mpa_sand.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
-  width=8.62,
-  height = 6.28,
-  dpi=600
-) 
+# EM1Vs_depth_exc2Mpa_sand <-Walpeup %>% filter(EM_1m_PRED < 10) %>% 
+#   ggplot( aes(x=`EM_05m_PRE`, y=`The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm`)) + 
+#   geom_point()+
+#   geom_smooth(method = lm, se = FALSE) +
+#   stat_regline_equation(
+#     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+#     formula = (y ~ x)
+#   ) +
+#   geom_point(data = Walpeup_drift_pts %>% filter(EM_1m_PRED < 10) , colour = "red")+
+#   labs(#title = "Walpeup EM vs penetrometer sand ",
+#        #subtitle = "",
+#        #x = "EM mS/m (depth 1meter)", 
+#        x = "",
+#        y = "Depth exceedes \n2.5MPa"     )  +
+#   theme(panel.background = element_rect(fill = "#BFD5E3"))
+# 
+# ggsave(
+#   device = "png",
+#   filename = "EM1Vs_depth_exc2Mpa_sand.png",
+#   path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
+#   width=8.62,
+#   height = 6.28,
+#   dpi=600
+# ) 
 
 
 ################################################################################
@@ -189,12 +189,11 @@ ggsave(
 
 #1
 EM1VMean
-EM1VMean_sand
+
 
 
 #4
 EM1Vs_depth_exc2Mpa
-EM1Vs_depth_exc2Mpa_sand
 
 
 EM_1m_plots_Reg <-
@@ -204,8 +203,6 @@ EM_1m_plots_Reg <-
     
     EM1Vs_depth_exc2Mpa,
     #EM1Vs_depth_exc2Mpa_sand,
-    
-    #labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
     ncol = 2,
     nrow = 1
   ) 

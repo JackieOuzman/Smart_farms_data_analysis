@@ -123,13 +123,14 @@ Walpeup_drift_pts <- Walpeup %>% filter(GPS_Drift == "drift")
 ##################################################################################
 
 EM05VMean <- ggplot(Walpeup, aes(x=`EM_05m_PRE`, y=`mean.resistance.value.for.the.profile`)) + 
-  geom_point()+
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
   stat_regline_equation(
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  geom_point(data = Walpeup_drift_pts, colour = "red")+
+  geom_point(data = Walpeup_drift_pts, colour = "red", size=1.0)+
   labs(#title = "Walpeup EM vs penetrometer ",
                #subtitle = "",
                #x = "EM mS/m (depth 0.5meter)", 
@@ -151,13 +152,13 @@ ggsave(
 
 EM05VMean_sand <-Walpeup %>% filter(EM_05m_PRE < 10) %>% 
   ggplot(aes(x=`EM_05m_PRE`, y=`mean.resistance.value.for.the.profile`)) + 
-  geom_point()+
+  geom_point(alpha =0.5, size=0.3)+
   geom_smooth(method = lm, se = FALSE) +
   stat_regline_equation(
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  geom_point(data = Walpeup_drift_pts %>% filter(EM_05m_PRE < 10) , colour = "red")+
+  geom_point(data = Walpeup_drift_pts %>% filter(EM_05m_PRE < 10) , colour = "red",size=1.0)+
   labs(#title = "Walpeup EM vs penetrometer - Sand only",
        #subtitle = "",
        x = "", 
@@ -185,13 +186,13 @@ ggsave(
 ### 2a. "max..Peak..resistance.value.for.the.profile" vs "EM_05m_PRE" 
 ##################################################################################
 EM05VMax <- ggplot(Walpeup, aes(x=`EM_05m_PRE`, y=`max..Peak..resistance.value.for.the.profile`)) + 
-  geom_point()+
+  geom_point(alpha =0.5, size=0.3)+theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
   stat_regline_equation(
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  geom_point(data = Walpeup_drift_pts, colour = "red")+
+  geom_point(data = Walpeup_drift_pts, colour = "red", size=1.0)+
   labs(#title = "Walpeup EM vs penetrometer ",
        #subtitle = "",
        x = "",
@@ -214,13 +215,13 @@ ggsave(
 
 EM05VMax_sand <-Walpeup %>% filter(EM_05m_PRE < 10) %>% 
   ggplot( aes(x=`EM_05m_PRE`, y=`max..Peak..resistance.value.for.the.profile`)) + 
-  geom_point()+
+  geom_point(alpha =0.5, size=0.3)+
   geom_smooth(method = lm, se = FALSE) +
   stat_regline_equation(
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  geom_point(data = Walpeup_drift_pts %>% filter(EM_05m_PRE < 10) , colour = "red")+
+  geom_point(data = Walpeup_drift_pts %>% filter(EM_05m_PRE < 10) , colour = "red",size=1.0)+
   labs(#title = "Walpeup EM vs penetrometer sand ",
        #subtitle = "",
        x = "",
@@ -245,13 +246,14 @@ ggsave(
 
 names(Walpeup)
 EM05Vlocation_peak <- ggplot(Walpeup, aes(x=`EM_05m_PRE`, y=`location.in.the.profile.of.first.peak..up.to.50cm.`)) + 
-  geom_point()+
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
   stat_regline_equation(
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  geom_point(data = Walpeup_drift_pts, colour = "red")+
+  geom_point(data = Walpeup_drift_pts, colour = "red", size=1.0)+
   labs(#title = "Walpeup EM vs penetrometer ",
        #subtitle = "",
        x = "", 
@@ -274,13 +276,13 @@ ggsave(
 
 EM05Vlocation_peak_sand <-Walpeup %>% filter(EM_05m_PRE < 10) %>% 
   ggplot( aes(x=`EM_05m_PRE`, y=`location.in.the.profile.of.first.peak..up.to.50cm.`)) + 
-  geom_point()+
+  geom_point(alpha =0.5, size=0.3)+
   geom_smooth(method = lm, se = FALSE) +
   stat_regline_equation(
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  geom_point(data = Walpeup_drift_pts %>% filter(EM_05m_PRE < 10) , colour = "red")+
+  geom_point(data = Walpeup_drift_pts %>% filter(EM_05m_PRE < 10) , colour = "red", size=1.0)+
   labs(#title = "Walpeup EM vs penetrometer sand ",
        #subtitle = "",
        #x = "EM mS/m (depth 0.5meter)", 
@@ -305,13 +307,14 @@ ggsave(
 
 names(Walpeup)
 EM05Vs_depth_exc2Mpa <- ggplot(Walpeup, aes(x=`EM_05m_PRE`, y=`The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm`)) + 
-  geom_point()+
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
   stat_regline_equation(
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  geom_point(data = Walpeup_drift_pts, colour = "red")+
+  geom_point(data = Walpeup_drift_pts, colour = "red", size=1.0)+
   labs(#title = "Walpeup EM vs penetrometer ",
        #subtitle = "",
        #x = "EM mS/m (depth 0.5meter)",
@@ -334,13 +337,13 @@ ggsave(
 
 EM05Vs_depth_exc2Mpa_sand <-Walpeup %>% filter(EM_05m_PRE < 10) %>% 
   ggplot( aes(x=`EM_05m_PRE`, y=`The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm`)) + 
-  geom_point()+
+  geom_point(alpha =0.5, size=0.3)+
   geom_smooth(method = lm, se = FALSE) +
   stat_regline_equation(
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  geom_point(data = Walpeup_drift_pts %>% filter(EM_05m_PRE < 10) , colour = "red")+
+  geom_point(data = Walpeup_drift_pts %>% filter(EM_05m_PRE < 10) , colour = "red",size=1.0)+
   labs(#title = "Walpeup EM vs penetrometer sand ",
        #subtitle = "",
        #x = "EM mS/m (depth 0.5meter)", 

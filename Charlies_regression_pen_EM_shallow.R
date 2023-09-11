@@ -32,6 +32,8 @@ Charlies <- read.csv("X:/Therese_Jackie/smart_farms/sites/Bute_Charlie/Bute_Site
                     
 names(Charlies)
 
+Charlies <- Charlies %>%  filter(Distianct_to.Rip_area>0)
+
 ##################################################################################
 ### edit the dataset - I am just looking at pen readings 
 ##################################################################################

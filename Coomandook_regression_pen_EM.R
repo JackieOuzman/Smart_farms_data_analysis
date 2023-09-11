@@ -27,8 +27,8 @@ library(ggpubr)
 ##################################################################################
 ### import dataset  
 ##################################################################################
-
-Coomandook <- read.csv("X:/Therese_Jackie/smart_farms/sites/Coomondook/Coomandook_pen_vs_em_2023.csv", skip=2)
+                        
+Coomandook <- read.csv("X:/Therese_Jackie/smart_farms/sites/Coomandook/Coomandook_pen_vs_em_2023.csv", skip=2)
                                          
 names(Coomandook)
 # remove the na
@@ -39,8 +39,7 @@ Coomandook <- Coomandook %>%
 ### edit the dataset - I am just looking at pen readings 
 ##################################################################################
 for_Pen_correlation <- Coomandook %>% 
-  dplyr::select("X0.25":"Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.72.5cm.") %>% 
-  dplyr::select(-"notes" )   
+  dplyr::select("X0.25":"Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.72.5cm.") 
 
 
 for_Pen_EM_correlation <- Coomandook %>% 
@@ -94,7 +93,7 @@ names(Coomandook)
 ##################################################################################
 
 names(Coomandook)
-Eca1_Max <- ggplot(Coomandook, aes(x=`ECa_1`, y=`max..Peak..resistance.value.for.the.profile`)) + 
+EMShallow_Mean <- ggplot(Coomandook, aes(x=`EM05m`, y=`mean.resistance.value.for.the.profile`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -107,10 +106,10 @@ Eca1_Max <- ggplot(Coomandook, aes(x=`ECa_1`, y=`max..Peak..resistance.value.for
     #subtitle = "",
     x = "", 
     #x = "EM mS/m (depth Shallow)", 
-    y = "Max \nresistance"     )
+    y = "Mean \nresistance"     )
 ggsave(
   device = "png",
-  filename = "Eca1_Max.png",
+  filename = "EMShallow_Mean.png",
   path= "X:/Therese_Jackie/smart_farms/sites/Coomandook/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
@@ -118,7 +117,7 @@ ggsave(
 ) 
 
 
-Eca2_Max <- ggplot(Coomandook, aes(x=`ECa_2`, y=`max..Peak..resistance.value.for.the.profile`)) + 
+EMShallow_Area_profile <- ggplot(Coomandook, aes(x=`EM05m`, y=`total`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -131,9 +130,9 @@ Eca2_Max <- ggplot(Coomandook, aes(x=`ECa_2`, y=`max..Peak..resistance.value.for
     #subtitle = "",
     x = "", 
     #x = "EM mS/m (depth Shallow)", 
-    y = "Max \nresistance"     )
+    y = "Area \nprofile"     )
 
-Eca3_Max <- ggplot(Coomandook, aes(x=`ECa_3`, y=`max..Peak..resistance.value.for.the.profile`)) + 
+EMShallow_Area_0_50 <- ggplot(Coomandook, aes(x=`EM05m`, y=`X0.50`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -146,9 +145,9 @@ Eca3_Max <- ggplot(Coomandook, aes(x=`ECa_3`, y=`max..Peak..resistance.value.for
     #subtitle = "",
     x = "", 
     #x = "EM mS/m (depth Shallow)", 
-    y = "Max \nresistance"     )
+    y = "Area \n0-50cm"     )
 
-Eca4_Max <- ggplot(Coomandook, aes(x=`ECa_4`, y=`max..Peak..resistance.value.for.the.profile`)) + 
+EMShallow_Depth_peak <- ggplot(Coomandook, aes(x=`EM05m`, y=`location.in.the.profile.of.first.peak..up.to.50cm.`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -161,12 +160,28 @@ Eca4_Max <- ggplot(Coomandook, aes(x=`ECa_4`, y=`max..Peak..resistance.value.for
     #subtitle = "",
     x = "", 
     #x = "EM mS/m (depth Shallow)", 
-    y = "Max \nresistance"     )
+    y = "Depth to peak \nup to 50cm"     )
 
-Eca1_Max
-Eca2_Max
-Eca3_Max
-Eca4_Max
+EMShallow_Depth_exceeds <- ggplot(Coomandook, aes(x=`EM05m`, y=`The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.72.5cm`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  
+  labs(#title = "Coomandook EM vs penetrometer ",
+    #subtitle = "",
+    x = "", 
+    #x = "EM mS/m (depth Shallow)", 
+    y = "Depth exceeds \n2.5MPa"     )
+
+EMShallow_Mean
+EMShallow_Area_profile
+EMShallow_Area_0_50
+EMShallow_Depth_peak
+EMShallow_Depth_exceeds
 ################################################################################
 ### Group the plots
 
@@ -177,20 +192,21 @@ Eca4_Max
 
 Eca_plots_Reg <-
   ggarrange(
-    Eca1_Max,
-    Eca2_Max,
-    Eca3_Max,
-    Eca4_Max,
+    EMShallow_Mean,
+    EMShallow_Area_profile,
+    EMShallow_Area_0_50,
+    EMShallow_Depth_peak,
+    EMShallow_Depth_exceeds,
     
     
     #labels = c("ECa 1", "ECa 2", "ECa 3", "ECa 4"),
     ncol = 2,
-    nrow = 2
+    nrow = 3
   ) 
 
 Eca_plots_Reg_Reg_1 <-
   annotate_figure(Eca_plots_Reg, top = text_grob(
-    "Top soil mapper vs Max Penetrometer. 
+    "EM vs Penetrometer. 
     Site: Coomandook",
     color = "Black",
     face = "bold",
@@ -199,8 +215,3 @@ Eca_plots_Reg_Reg_1 <-
 Eca_plots_Reg_Reg_1
 ggexport(Eca_plots_Reg_Reg_1, filename = "X:/Therese_Jackie/smart_farms/sites/Coomandook/Analysis/plots_regression/EM_Shallow_plots_Reg.png")
 
-##################################################################################
-######################################   EM DEEP #################################
-
-### Most of the EM deep readings are negative I wont use them
-#

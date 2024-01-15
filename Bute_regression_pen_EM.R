@@ -42,7 +42,7 @@ for_Pen_EM_correlation <- Bute %>%
   dplyr::select("X0.25":"EM1m"      )
 names(for_Pen_EM_correlation)
 
-#
+#Make reporting 
 
 #################################################################################
 ### correlation options - 2
@@ -72,32 +72,37 @@ write.csv(correltion_matrix_pen_em_flat,
 
 
 
+names(Bute)
+Bute <- Bute %>% select(
+                        "max..Peak..resistance.value.up.to.50cm"    ,
+                        "location.in.the.profile.of.first.peak..up.to.50cm."   ,
+                        "The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.50cm"  ,
+                        "Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.50cm.",
+                                                "X0.50" ,
+                        "EM05m" ,                                                              
+                        "EM1m"
+                        )
 
-
+Bute <- Bute %>% rename(
+  Peak_Resistance = "max..Peak..resistance.value.up.to.50cm"    , #a
+  Depth_to_peak = "location.in.the.profile.of.first.peak..up.to.50cm."   , #b 
+  Depth_to_2.5MPa ="The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.50cm"  , #c
+  Area_under_curve_to_2.5MPa ="Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.50cm.", #d
+  Area_under_curve_to_50cm ="X0.50" #e
+)
 
 #################################################################################
 ### Plots
 ##################################################################################
 names(Bute)
-#Lets try ... based on the correlation matrix - not that its very good!
-#1. "mean.resistance.value.for.the.profile" vs "EM05m"  
-#1a. "medium.resistance.value.for.the.profile"                             
-  
-#2. "total" vs "EM05m"  
-#3. "X0.50" vs "EM05m"
-#4.  "max..Peak..resistance.value.for.the.profile"  vs "EM05m"   
-#5.  "The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm"     
 
-
-#1. "mean.resistance.value.for.the.profile" vs "Deep"  
-#2. "X0.50" vs "Deep"  
 
 
 ##################################################################################
 ### 1a. 
 ##################################################################################
 
-EMShallowVMean <- ggplot(Bute, aes(x=`EM05m`, y=`mean.resistance.value.for.the.profile`)) + 
+EMShallowVPeak <- ggplot(Bute, aes(x=`EM05m`, y=`Peak_Resistance`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -109,27 +114,20 @@ EMShallowVMean <- ggplot(Bute, aes(x=`EM05m`, y=`mean.resistance.value.for.the.p
                #subtitle = "",
                #x = "EM mS/m (Shallow)", 
                x = "",
-               y = "Mean \nresistance"     )
+               y = "Peak \nresistance"     )
 ggsave(
   device = "png",
-  filename = "EMShallowVMean.png",
+  filename = "EMShallowVPeak",
   path= "X:/Therese_Jackie/smart_farms/sites/Bute/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
 ) 
+#################################################################################
+##1b. 
+#################################################################################
 
-
-
-
-
-
-
-
-##################################################################################
-### 2a. "total" vs "Shallow" 
-##################################################################################
-EM_Shallow_total <- ggplot(Bute, aes(x=`EM05m`, y=`total`)) + 
+EMShallowVDepth_to_peak <- ggplot(Bute, aes(x=`EM05m`, y=`Depth_to_peak`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -137,32 +135,23 @@ EM_Shallow_total <- ggplot(Bute, aes(x=`EM05m`, y=`total`)) +
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  labs(#title = "Bute EM vs penetrometer ",
-       #subtitle = "",
-       x = "",
-       #x = "EM mS/m (depth Shallow)",
-       y = "Area \nprofile"     )
+  labs(
+    x = "",
+    y = "Depth to peak"     )
 ggsave(
   device = "png",
-  filename = "EM_Shallow_profile.png",
+  filename = "EMShallowVDepth_to_peak",
   path= "X:/Therese_Jackie/smart_farms/sites/Bute/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
 ) 
 
+#################################################################################
+##1c. 
+#################################################################################
 
-
-
-
-
-
-##################################################################################
-### #3a. "max" vs "EM05m"  
-##################################################################################
-
-names(Bute)
-EMShallow_Max <- ggplot(Bute, aes(x=`EM05m`, y=`max..Peak..resistance.value.for.the.profile`)) + 
+EMShallowVDepth_to_2.5MPa <- ggplot(Bute, aes(x=`EM05m`, y=`Depth_to_2.5MPa`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -170,33 +159,80 @@ EMShallow_Max <- ggplot(Bute, aes(x=`EM05m`, y=`max..Peak..resistance.value.for.
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  
-  labs(#title = "Bute EM vs penetrometer ",
-       #subtitle = "",
-       x = "", 
-       #x = "EM mS/m (depth Shallow)", 
-       y = "Max \nresistance"     )
+  labs(
+    x = "",
+    y = "Depth to 2.5MPa")
 ggsave(
   device = "png",
-  filename = "EMShallow_MaxResi.png",
+  filename = "Depth_to_2.5MPa",
   path= "X:/Therese_Jackie/smart_farms/sites/Bute/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
 ) 
 
+#################################################################################
+##1d. 
+#################################################################################
 
+EMShallowVArea_under_curve_to_2.5MPa <- ggplot(Bute, aes(x=`EM05m`, y=`Area_under_curve_to_2.5MPa`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Area under curve to 2.5MPa")
+ggsave(
+  device = "png",
+  filename = "Area_under_curve_to_2.5MPa",
+  path= "X:/Therese_Jackie/smart_farms/sites/Bute/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
 
+#################################################################################
+##1e. 
+#################################################################################
 
+EMShallowVArea_under_curve_to_50cm <- ggplot(Bute, aes(x=`EM05m`, y=`Area_under_curve_to_50cm`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Area under curve to 50cm")
+ggsave(
+  device = "png",
+  filename = "Area_under_curve_to_50cm",
+  path= "X:/Therese_Jackie/smart_farms/sites/Bute/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
 
 ################################################################################
+################################################################################
+### Deep EM
+################################################################################
+################################################################################
+
+
+
 
 ##################################################################################
-### #5a. "location.in.the.profile.of.max..peak." vs "EM05mw"  
+### 2a. 
 ##################################################################################
 
-names(Bute)
-EMShallow_location_to_max_profile <- ggplot(Bute, aes(x=`EM05m`, y=`location.in.the.profile.of.max..peak.`)) + 
+EMDeepVPeak <- ggplot(Bute, aes(x=`EM1m`, y=`Peak_Resistance`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -204,29 +240,27 @@ EMShallow_location_to_max_profile <- ggplot(Bute, aes(x=`EM05m`, y=`location.in.
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  
   labs(#title = "Bute EM vs penetrometer ",
     #subtitle = "",
-    x = "", 
-    #x = "EM mS/m (depth Shallow)", 
-    y = "Depth to peak \nfor profile"     )
+    #x = "EM mS/m (Shallow)", 
+    x = "",
+    y = "Peak \nresistance"     )
 ggsave(
   device = "png",
-  filename = "EMShallow_location_to_max_profile.png",
+  filename = "EMDeepVPeak",
   path= "X:/Therese_Jackie/smart_farms/sites/Bute/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
 ) 
+
+
+
 ################################################################################
+##2b. 
+#################################################################################
 
-
-##################################################################################
-### #5a. "The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm" vs "EM05m"  
-##################################################################################
-
-names(Bute)
-EMShallow_depth_exceeds_2_5 <- ggplot(Bute, aes(x=`EM05m`, y=`The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.50cm`)) + 
+EMDeepVDepth_to_peak <- ggplot(Bute, aes(x=`EM1m`, y=`Depth_to_peak`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -234,46 +268,114 @@ EMShallow_depth_exceeds_2_5 <- ggplot(Bute, aes(x=`EM05m`, y=`The.depth.when.res
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  labs(#title = "Bute EM vs penetrometer ",
-    #subtitle = "",
-    x = "", 
-    #x = "EM mS/m (depth Shallow)", 
-    y = "Depth exceeds\n2.5MPa"     )
+  labs(
+    x = "",
+    y = "Depth to peak"     )
 ggsave(
   device = "png",
-  filename = "EMShallow_depth_exceeds_2_5.png",
+  filename = "EMDeepVDepth_to_peak",
   path= "X:/Therese_Jackie/smart_farms/sites/Bute/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
 ) 
+
+#################################################################################
+##2c. 
+#################################################################################
+
+EMDeepVDepth_to_2.5MPa <- ggplot(Bute, aes(x=`EM1m`, y=`Depth_to_2.5MPa`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Depth to 2.5MPa")
+ggsave(
+  device = "png",
+  filename = "EMDeepVSDepth_to_2.5MPa",
+  path= "X:/Therese_Jackie/smart_farms/sites/Bute/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##2d. 
+#################################################################################
+
+EMDeepVArea_under_curve_to_2.5MPa <- ggplot(Bute, aes(x=`EM1m`, y=`Area_under_curve_to_2.5MPa`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Area under curve to 2.5MPa")
+ggsave(
+  device = "png",
+  filename = "EMDeepVsArea_under_curve_to_2.5MPa",
+  path= "X:/Therese_Jackie/smart_farms/sites/Bute/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##2e. 
+#################################################################################
+
+EMDeepVArea_under_curve_to_50cm <- ggplot(Bute, aes(x=`EM1m`, y=`Area_under_curve_to_50cm`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Area under curve to 50cm")
+ggsave(
+  device = "png",
+  filename = "EMDeepVsArea_under_curve_to_50cm",
+  path= "X:/Therese_Jackie/smart_farms/sites/Bute/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+#################################################################################
+#################################################################################
+#################################################################################
+
+
+EMShallowVPeak
+EMShallowVDepth_to_peak
+EMShallowVDepth_to_2.5MPa
+EMShallowVArea_under_curve_to_2.5MPa
+EMShallowVArea_under_curve_to_50cm
+
 ################################################################################
 
-
-
-
-
-EMShallowVMean
-EMShallow_Max
-EM_Shallow_total
-EMShallow_location_to_max_profile
-EMShallow_depth_exceeds_2_5
 
 ################################################################################
 ### Group the plots
 
 
-
-
-
-
 EMShallow_plots_Reg <-
   ggarrange(
-    EMShallowVMean,
-    EMShallow_Max,
-    EM_Shallow_total,
-    EMShallow_location_to_max_profile,
-    EMShallow_depth_exceeds_2_5,
+    EMShallowVPeak,
+    EMShallowVDepth_to_peak,
+    EMShallowVDepth_to_2.5MPa,
+    EMShallowVArea_under_curve_to_2.5MPa,
+    EMShallowVArea_under_curve_to_50cm,
     
     #labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
     ncol = 2,
@@ -294,5 +396,33 @@ ggexport(EMShallow_plots_Reg_1, filename = "X:/Therese_Jackie/smart_farms/sites/
 ##################################################################################
 ######################################   EM DEEP #################################
 
-### Most of the EM deep readings are negative I wont use them
-#
+
+EMDeepVPeak
+EMDeepVDepth_to_peak
+EMDeepVDepth_to_2.5MPa
+EMDeepVArea_under_curve_to_2.5MPa
+EMDeepVArea_under_curve_to_50cm
+
+EMDeep_plots_Reg <-
+  ggarrange(
+    EMDeepVPeak,
+    EMDeepVDepth_to_peak,
+    EMDeepVDepth_to_2.5MPa,
+    EMDeepVArea_under_curve_to_2.5MPa,
+    EMDeepVArea_under_curve_to_50cm,
+    
+    #labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
+    ncol = 2,
+    nrow = 3
+  ) 
+
+EMDeep_plots_Reg_1 <-
+  annotate_figure(EMDeep_plots_Reg, top = text_grob(
+    "EM38 deep vs Penetrometer parameters. 
+    Site: Bute",
+    color = "Black",
+    face = "bold",
+    size = 14
+  ))
+EMDeep_plots_Reg_1
+ggexport(EMDeep_plots_Reg_1, filename = "X:/Therese_Jackie/smart_farms/sites/Bute/Analysis/plots_regression/EM_Deep_plots_Reg.png")

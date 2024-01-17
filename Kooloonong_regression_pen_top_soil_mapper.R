@@ -937,7 +937,7 @@ ggexport(Tillage_plots_Reg_1, filename = "X:/Therese_Jackie/smart_farms/sites/Ko
 ### D2I_a. 
 ##################################################################################
 
-D2IVPeak <- ggplot(Lameroo, aes(x=`D2I`, y=`Peak_Resistance`)) + 
+D2IVPeak <- ggplot(Kooloonong, aes(x=`D2I`, y=`Peak_Resistance`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -951,7 +951,7 @@ D2IVPeak <- ggplot(Lameroo, aes(x=`D2I`, y=`Peak_Resistance`)) +
 ggsave(
   device = "png",
   filename = "D2IVPeak.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Wikarie/Analysis/plots_regression/",
+  path= "X:/Therese_Jackie/smart_farms/sites/Kooloonong/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
@@ -963,7 +963,7 @@ ggsave(
 ##D2I_b. 
 #################################################################################
 
-D2IVDepth_to_peak <- ggplot(Lameroo, aes(x=`D2I`, y=`Depth_to_peak`)) + 
+D2IVDepth_to_peak <- ggplot(Kooloonong, aes(x=`D2I`, y=`Depth_to_peak`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -977,7 +977,7 @@ D2IVDepth_to_peak <- ggplot(Lameroo, aes(x=`D2I`, y=`Depth_to_peak`)) +
 ggsave(
   device = "png",
   filename = "D2IVDepth_to_peak.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Wikarie/Analysis/plots_regression/",
+  path= "X:/Therese_Jackie/smart_farms/sites/Kooloonong/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
@@ -987,7 +987,7 @@ ggsave(
 ##D2I_c. 
 #################################################################################
 
-D2IVDepth_to_2.5MPa <- ggplot(Lameroo, aes(x=`D2I`, y=`Depth_to_2.5MPa`)) + 
+D2IVDepth_to_2.5MPa <- ggplot(Kooloonong, aes(x=`D2I`, y=`Depth_to_2.5MPa`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -1001,7 +1001,7 @@ D2IVDepth_to_2.5MPa <- ggplot(Lameroo, aes(x=`D2I`, y=`Depth_to_2.5MPa`)) +
 ggsave(
   device = "png",
   filename = "D2IVSDepth_to_2.5MPa.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Wikarie/Analysis/plots_regression/",
+  path= "X:/Therese_Jackie/smart_farms/sites/Kooloonong/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
@@ -1011,7 +1011,7 @@ ggsave(
 ##D2I_d. 
 #################################################################################
 
-D2IVArea_under_curve_to_2.5MPa <- ggplot(Lameroo, aes(x=`D2I`, y=`Area_under_curve_to_2.5MPa`)) + 
+D2IVArea_under_curve_to_2.5MPa <- ggplot(Kooloonong, aes(x=`D2I`, y=`Area_under_curve_to_2.5MPa`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -1025,7 +1025,7 @@ D2IVArea_under_curve_to_2.5MPa <- ggplot(Lameroo, aes(x=`D2I`, y=`Area_under_cur
 ggsave(
   device = "png",
   filename = "D2IVsArea_under_curve_to_2.5MPa.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Wikarie/Analysis/plots_regression/",
+  path= "X:/Therese_Jackie/smart_farms/sites/Kooloonong/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
@@ -1035,7 +1035,7 @@ ggsave(
 ##D2I_e. 
 #################################################################################
 
-D2IVArea_under_curve_to_50cm <- ggplot(Lameroo, aes(x=`D2I`, y=`Area_under_curve_to_50cm`)) + 
+D2IVArea_under_curve_to_50cm <- ggplot(Kooloonong, aes(x=`D2I`, y=`Area_under_curve_to_50cm`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -1049,7 +1049,7 @@ D2IVArea_under_curve_to_50cm <- ggplot(Lameroo, aes(x=`D2I`, y=`Area_under_curve
 ggsave(
   device = "png",
   filename = "D2IVsArea_under_curve_to_50cm.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Wikarie/Analysis/plots_regression/",
+  path= "X:/Therese_Jackie/smart_farms/sites/Kooloonong/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
@@ -1082,13 +1082,13 @@ D2I_plots_Reg <-
 D2I_plots_Reg_1 <-
   annotate_figure(D2I_plots_Reg, top = text_grob(
     "Top soil mapper D2I vs Penetrometer parameters. 
-    Site: Lameroo",
+    Site: Kooloonong",
     color = "Black",
     face = "bold",
     size = 14
   ))
 D2I_plots_Reg_1
-ggexport(D2I_plots_Reg_1, filename = "X:/Therese_Jackie/smart_farms/sites/Wikarie/Analysis/plots_regression/D2I_plots_Reg.png")
+ggexport(D2I_plots_Reg_1, filename = "X:/Therese_Jackie/smart_farms/sites/Kooloonong/Analysis/plots_regression/D2I_plots_Reg.png")
 
 
 

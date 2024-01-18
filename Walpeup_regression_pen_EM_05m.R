@@ -36,19 +36,12 @@ names(Walpeup)
 ### edit the dataset - I am just looking at pen readings 
 ##################################################################################
 for_Pen_correlation <- Walpeup %>% 
-  dplyr::select("X0.25":"Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.75cm.")
+  dplyr::select("X0.25":"Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.50cm.")
 
 for_Pen_EM_correlation <- Walpeup %>% 
   dplyr::select("X0.25":"EM_05m_PRE")
 
-# #################################################################################
-# ### correlation options - 1
-# ##################################################################################
-# 
-# correltion_matrix_pen_1 <- cor(for_Pen_correlation, method = c("pearson"#, 
-#                                                              #use = "complete.obs" #This is for missing data - but doesnt work with my dataset
-#                                                              ))
-# correltion_matrix_pen_1 <- round(correltion_matrix_pen, 2)
+
 
 #################################################################################
 ### correlation options - 2
@@ -79,26 +72,13 @@ write.csv(correltion_matrix_pen_em_flat,
 
 
 
-# #################################################################################
-# ### correlation options - 3
-# ##################################################################################
-# chart.Correlation(for_Pen_correlation, histogram=TRUE, pch=19)
 
 
 
 #################################################################################
 ### Plots
 ##################################################################################
-names(for_Pen_EM_correlation)
-#Lets try ... based on the correlation matrix - not that its very good!
-#1. "mean.resistance.value.for.the.profile" vs "EM_05m_PRE"  
-#2. "max..Peak..resistance.value.for.the.profile" vs "EM_05m_PRE"  
-#3. "location.in.the.profile.of.first.peak..up.to.50cm." vs "EM_05m_PRE"  
-#4. "The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm" vs "EM_05m_PRE"  
-
-
-#1. "mean.resistance.value.for.the.profile" vs "EM_1m_PRED"  
-#2. "The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm" vs "EM_1m_PRED"  
+ 
 
 str(Walpeup)
 
@@ -118,11 +98,35 @@ Walpeup <- Walpeup %>%
 
 Walpeup_drift_pts <- Walpeup %>% filter(GPS_Drift == "drift")
 
+names(Walpeup)
+
+Walpeup <- Walpeup %>% select(
+  "max..Peak..resistance.value.up.to.50cm"    ,
+  "location.in.the.profile.of.first.peak..up.to.50cm."   ,
+  "The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.50cm"  ,
+  "Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.50cm.",
+  "X0.50" ,
+  "EM_05m_PRE" ,                                                              
+  "EM_1m_PRED"
+)
+
+Walpeup <- Walpeup %>% rename(
+  Peak_Resistance = "max..Peak..resistance.value.up.to.50cm"    , #a
+  Depth_to_peak = "location.in.the.profile.of.first.peak..up.to.50cm."   , #b 
+  Depth_to_2.5MPa ="The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.50cm"  , #c
+  Area_under_curve_to_2.5MPa ="Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.50cm.", #d
+  Area_under_curve_to_50cm ="X0.50", #e
+  EM05m = "EM_05m_PRE" ,                                                              
+  EM1m = "EM_1m_PRED"
+  
+)
+
+
 ##################################################################################
 ### 1a. 
 ##################################################################################
 
-EM05VMean <- ggplot(Walpeup, aes(x=`EM_05m_PRE`, y=`mean.resistance.value.for.the.profile`)) + 
+EMShallowVPeak <- ggplot(Walpeup, aes(x=`EM05m`, y=`Peak_Resistance`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -130,122 +134,23 @@ EM05VMean <- ggplot(Walpeup, aes(x=`EM_05m_PRE`, y=`mean.resistance.value.for.th
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  geom_point(data = Walpeup_drift_pts, colour = "red", size=1.0)+
-  labs(#title = "Walpeup EM vs penetrometer ",
-               #subtitle = "",
-               #x = "EM mS/m (depth 0.5meter)", 
-               x = "",
-               y = "Mean \nresistance"     )
+  labs( 
+    x = "",
+    y = "Peak \nresistance"     )
 ggsave(
   device = "png",
-  filename = "EM05VMean.png",
+  filename = "EMShallowVPeak.png",
   path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
 ) 
 
+#################################################################################
+##1b. 
+#################################################################################
 
-
-#https://link.springer.com/article/10.1023/b:prag.0000040807.18932.80
-#Sandy soils less than 10 - but this is not calibrated
-
-EM05VMean_sand <-Walpeup %>% filter(EM_05m_PRE < 10) %>% 
-  ggplot(aes(x=`EM_05m_PRE`, y=`mean.resistance.value.for.the.profile`)) + 
-  geom_point(alpha =0.5, size=0.3)+
-  geom_smooth(method = lm, se = FALSE) +
-  stat_regline_equation(
-    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-    formula = (y ~ x)
-  ) +
-  geom_point(data = Walpeup_drift_pts %>% filter(EM_05m_PRE < 10) , colour = "red",size=1.0)+
-  labs(#title = "Walpeup EM vs penetrometer - Sand only",
-       #subtitle = "",
-       x = "", 
-       #x = "EM mS/m (depth 0.5meter)", 
-       y = "Mean \nresistance"
-  )+
-  theme(panel.background = element_rect(fill = "#BFD5E3"))
-
-
-
-
-
-ggsave(
-  device = "png",
-  filename = "EM05VMean_sand.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
-  width=8.62,
-  height = 6.28,
-  dpi=600
-) 
-
-
-
-##################################################################################
-### 2a. "max..Peak..resistance.value.for.the.profile" vs "EM_05m_PRE" 
-##################################################################################
-EM05VMax <- ggplot(Walpeup, aes(x=`EM_05m_PRE`, y=`max..Peak..resistance.value.for.the.profile`)) + 
-  geom_point(alpha =0.5, size=0.3)+theme_bw()+
-  geom_smooth(method = lm, se = FALSE) +
-  stat_regline_equation(
-    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-    formula = (y ~ x)
-  ) +
-  geom_point(data = Walpeup_drift_pts, colour = "red", size=1.0)+
-  labs(#title = "Walpeup EM vs penetrometer ",
-       #subtitle = "",
-       x = "",
-       #x = "EM mS/m (depth 0.5meter)",
-       y = "Max \nresistance"     )
-ggsave(
-  device = "png",
-  filename = "EM05VMax.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
-  width=8.62,
-  height = 6.28,
-  dpi=600
-) 
-
-
-
-################################################################################
-### 2b. "max..Peak..resistance.value.for.the.profile" vs "EM_05m_PRE"  SAND
-
-
-EM05VMax_sand <-Walpeup %>% filter(EM_05m_PRE < 10) %>% 
-  ggplot( aes(x=`EM_05m_PRE`, y=`max..Peak..resistance.value.for.the.profile`)) + 
-  geom_point(alpha =0.5, size=0.3)+
-  geom_smooth(method = lm, se = FALSE) +
-  stat_regline_equation(
-    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-    formula = (y ~ x)
-  ) +
-  geom_point(data = Walpeup_drift_pts %>% filter(EM_05m_PRE < 10) , colour = "red",size=1.0)+
-  labs(#title = "Walpeup EM vs penetrometer sand ",
-       #subtitle = "",
-       x = "",
-       #x = "EM mS/m (depth 0.5meter)",
-       y = "Max \nresistance"     )+
-  theme(panel.background = element_rect(fill = "#BFD5E3"))
-
-ggsave(
-  device = "png",
-  filename = "EM05VMax_sand.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
-  width=8.62,
-  height = 6.28,
-  dpi=600
-) 
-
-
-
-##################################################################################
-### #3a. "location.in.the.profile.of.first.peak..up.to.50cm." vs "EM_05m_PRE"  
-##################################################################################
-
-names(Walpeup)
-EM05Vlocation_peak <- ggplot(Walpeup, aes(x=`EM_05m_PRE`, y=`location.in.the.profile.of.first.peak..up.to.50cm.`)) + 
+EMShallowVDepth_to_peak <- ggplot(Walpeup, aes(x=`EM05m`, y=`Depth_to_peak`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -253,60 +158,23 @@ EM05Vlocation_peak <- ggplot(Walpeup, aes(x=`EM_05m_PRE`, y=`location.in.the.pro
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  geom_point(data = Walpeup_drift_pts, colour = "red", size=1.0)+
-  labs(#title = "Walpeup EM vs penetrometer ",
-       #subtitle = "",
-       x = "", 
-       #x = "EM mS/m (depth 0.5meter)", 
-       y = "Depth of peak \nresistance"     )
+  labs(
+    x = "",
+    y = "Depth to peak"     )
 ggsave(
   device = "png",
-  filename = "EM05Vlocation_peak.png",
+  filename = "EMShallowVDepth_to_peak.png",
   path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
 ) 
 
+#################################################################################
+##1c. 
+#################################################################################
 
-
-################################################################################
-### #3b. "location.in.the.profile.of.first.peak..up.to.50cm." vs "EM_05m_PRE"    SAND
-
-
-EM05Vlocation_peak_sand <-Walpeup %>% filter(EM_05m_PRE < 10) %>% 
-  ggplot( aes(x=`EM_05m_PRE`, y=`location.in.the.profile.of.first.peak..up.to.50cm.`)) + 
-  geom_point(alpha =0.5, size=0.3)+
-  geom_smooth(method = lm, se = FALSE) +
-  stat_regline_equation(
-    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-    formula = (y ~ x)
-  ) +
-  geom_point(data = Walpeup_drift_pts %>% filter(EM_05m_PRE < 10) , colour = "red", size=1.0)+
-  labs(#title = "Walpeup EM vs penetrometer sand ",
-       #subtitle = "",
-       #x = "EM mS/m (depth 0.5meter)", 
-       x = "", 
-       y = "Depth of peak \nresistance"     )+
-  theme(panel.background = element_rect(fill = "#BFD5E3"))
-
-ggsave(
-  device = "png",
-  filename = "EM05Vlocation_peak_sand.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
-  width=8.62,
-  height = 6.28,
-  dpi=600
-) 
-
-
-
-##################################################################################
-### #4a. "The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm" vs "EM_05m_PRE"  
-##################################################################################
-
-names(Walpeup)
-EM05Vs_depth_exc2Mpa <- ggplot(Walpeup, aes(x=`EM_05m_PRE`, y=`The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm`)) + 
+EMShallowVDepth_to_2.5MPa <- ggplot(Walpeup, aes(x=`EM05m`, y=`Depth_to_2.5MPa`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -314,95 +182,261 @@ EM05Vs_depth_exc2Mpa <- ggplot(Walpeup, aes(x=`EM_05m_PRE`, y=`The.depth.when.re
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  geom_point(data = Walpeup_drift_pts, colour = "red", size=1.0)+
-  labs(#title = "Walpeup EM vs penetrometer ",
-       #subtitle = "",
-       #x = "EM mS/m (depth 0.5meter)",
-       x = "", 
-       y = "Depth exceedes \n2.5MPa"     )
+  labs(
+    x = "",
+    y = "Depth to 2.5MPa")
 ggsave(
   device = "png",
-  filename = "EM05vsdepth_exc2Mpa.png",
+  filename = "Depth_to_2.5MPa.png",
   path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
 ) 
 
+#################################################################################
+##1d. 
+#################################################################################
 
-
-################################################################################
-### #4b. "The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm" vs "EM_05m_PRE"    SAND
-
-
-EM05Vs_depth_exc2Mpa_sand <-Walpeup %>% filter(EM_05m_PRE < 10) %>% 
-  ggplot( aes(x=`EM_05m_PRE`, y=`The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm`)) + 
+EMShallowVArea_under_curve_to_2.5MPa <- ggplot(Walpeup, aes(x=`EM05m`, y=`Area_under_curve_to_2.5MPa`)) + 
   geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
   stat_regline_equation(
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  geom_point(data = Walpeup_drift_pts %>% filter(EM_05m_PRE < 10) , colour = "red",size=1.0)+
-  labs(#title = "Walpeup EM vs penetrometer sand ",
-       #subtitle = "",
-       #x = "EM mS/m (depth 0.5meter)", 
-       x = "",
-       y = "Depth exceedes \n2.5MPa"     )  +
-  theme(panel.background = element_rect(fill = "#BFD5E3"))
-
+  labs(
+    x = "",
+    y = "Area under curve to 2.5MPa")
 ggsave(
   device = "png",
-  filename = "EM05Vs_depth_exc2Mpa_sand.png",
+  filename = "Area_under_curve_to_2.5MPa.png",
   path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
 ) 
+
+#################################################################################
+##1e. 
+#################################################################################
+
+EMShallowVArea_under_curve_to_50cm <- ggplot(Walpeup, aes(x=`EM05m`, y=`Area_under_curve_to_50cm`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Area under curve to 50cm")
+ggsave(
+  device = "png",
+  filename = "Area_under_curve_to_50cm.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+
+EMShallowVPeak
+EMShallowVDepth_to_peak
+EMShallowVDepth_to_2.5MPa
+EMShallowVArea_under_curve_to_2.5MPa
+EMShallowVArea_under_curve_to_50cm
+
+################################################################################
 
 
 ################################################################################
 ### Group the plots
 
-#1
-EM05VMean
-EM05VMean_sand
 
-#2
-EM05VMax
-EM05VMax_sand
-
-#3
-EM05Vlocation_peak
-EM05Vlocation_peak_sand
-#4
-EM05Vs_depth_exc2Mpa
-EM05Vs_depth_exc2Mpa_sand
-
-
-EM0_5m_plots_Reg <-
+EMShallow_plots_Reg <-
   ggarrange(
-    EM05VMean,
-    EM05VMean_sand,
-    EM05VMax,
-    EM05VMax_sand,
-    EM05Vlocation_peak,
-    EM05Vlocation_peak_sand,
-    EM05Vs_depth_exc2Mpa,
-    EM05Vs_depth_exc2Mpa_sand,
+    EMShallowVPeak,
+    EMShallowVDepth_to_peak,
+    EMShallowVDepth_to_2.5MPa,
+    EMShallowVArea_under_curve_to_2.5MPa,
+    EMShallowVArea_under_curve_to_50cm,
     
     #labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
     ncol = 2,
-    nrow = 4
+    nrow = 3
   ) 
 
-EM0_5m_plots_Reg_v1 <-
-  annotate_figure(EM0_5m_plots_Reg, top = text_grob(
-    "EM38 Depth 0.5m vs Penetrometer parameters. 
+EMShallow_plots_Reg_1 <-
+  annotate_figure(EMShallow_plots_Reg, top = text_grob(
+    "EM38 Shallow vs Penetrometer parameters. 
     Site: Walpeup",
     color = "Black",
     face = "bold",
     size = 14
   ))
-EM0_5m_plots_Reg_v1
-ggexport(EM0_5m_plots_Reg_v1, filename = "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/EM0_5m_plots_Reg.png")
+EMShallow_plots_Reg_1
+ggexport(EMShallow_plots_Reg_1, filename = "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/EM_Shallow_plots_Reg.png")
+
+
+
+
+##################################################################################
+### 2a. 
+##################################################################################
+
+EMDeepVPeak <- ggplot(Walpeup, aes(x=`EM1m`, y=`Peak_Resistance`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Peak \nresistance"     )
+ggsave(
+  device = "png",
+  filename = "EMDeepVPeak.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+
+
+################################################################################
+##2b. 
+#################################################################################
+
+EMDeepVDepth_to_peak <- ggplot(Walpeup, aes(x=`EM1m`, y=`Depth_to_peak`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Depth to peak"     )
+ggsave(
+  device = "png",
+  filename = "EMDeepVDepth_to_peak.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##2c. 
+#################################################################################
+
+EMDeepVDepth_to_2.5MPa <- ggplot(Walpeup, aes(x=`EM1m`, y=`Depth_to_2.5MPa`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Depth to 2.5MPa")
+ggsave(
+  device = "png",
+  filename = "EMDeepVSDepth_to_2.5MPa.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##2d. 
+#################################################################################
+
+EMDeepVArea_under_curve_to_2.5MPa <- ggplot(Walpeup, aes(x=`EM1m`, y=`Area_under_curve_to_2.5MPa`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Area under curve to 2.5MPa")
+ggsave(
+  device = "png",
+  filename = "EMDeepVsArea_under_curve_to_2.5MPa.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##2e. 
+#################################################################################
+
+EMDeepVArea_under_curve_to_50cm <- ggplot(Walpeup, aes(x=`EM1m`, y=`Area_under_curve_to_50cm`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Area under curve to 50cm")
+ggsave(
+  device = "png",
+  filename = "EMDeepVsArea_under_curve_to_50cm.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+#################################################################################
+#################################################################################
+#################################################################################
+
+######################################   EM DEEP #################################
+
+
+EMDeepVPeak
+EMDeepVDepth_to_peak
+EMDeepVDepth_to_2.5MPa
+EMDeepVArea_under_curve_to_2.5MPa
+EMDeepVArea_under_curve_to_50cm
+
+EMDeep_plots_Reg <-
+  ggarrange(
+    EMDeepVPeak,
+    EMDeepVDepth_to_peak,
+    EMDeepVDepth_to_2.5MPa,
+    EMDeepVArea_under_curve_to_2.5MPa,
+    EMDeepVArea_under_curve_to_50cm,
+    
+    #labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
+    ncol = 2,
+    nrow = 3
+  ) 
+
+EMDeep_plots_Reg_1 <-
+  annotate_figure(EMDeep_plots_Reg, top = text_grob(
+    "EM38 deep vs Penetrometer parameters. 
+    Site: Walpeup",
+    color = "Black",
+    face = "bold",
+    size = 14
+  ))
+EMDeep_plots_Reg_1
+ggexport(EMDeep_plots_Reg_1, filename = "X:/Therese_Jackie/smart_farms/sites/Walpeup/Analysis/plots_regression/EM_Deep_plots_Reg.png")

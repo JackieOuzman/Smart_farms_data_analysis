@@ -36,24 +36,16 @@ names(Boordaroo)
 ### edit the dataset - I am just looking at pen readings 
 ##################################################################################
 for_Pen_correlation <- Boordaroo %>% 
-  dplyr::select("X0.25":"Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.70cm.")
+  dplyr::select("X0.25":"Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.50cm.")
 
 for_Pen_EM_correlation <- Boordaroo %>% 
-  dplyr::select("X0.25":"EM05m", -"notes"      )
+  dplyr::select("X0.25":"EM05m", -"X"   , -"X.1", -notes   )
 names(for_Pen_EM_correlation)
 
 # #################################################################################
-# ### correlation options - 1
+# ### correlation options - 
 # ##################################################################################
-# 
-# correltion_matrix_pen_1 <- cor(for_Pen_correlation, method = c("pearson"#, 
-#                                                              #use = "complete.obs" #This is for missing data - but doesnt work with my dataset
-#                                                              ))
-# correltion_matrix_pen_1 <- round(correltion_matrix_pen, 2)
 
-#################################################################################
-### correlation options - 2
-##################################################################################
 
 correltion_matrix_pen_em <- rcorr(as.matrix(for_Pen_EM_correlation))
 
@@ -71,45 +63,40 @@ flattenCorrMatrix <- function(cormat, pmat) {
 ###use above function to flatten correlations
 correltion_matrix_pen_em_flat <- flattenCorrMatrix(correltion_matrix_pen_em$r, correltion_matrix_pen_em$P)
 
-
+view(correltion_matrix_pen_em_flat)
 
 write.csv(correltion_matrix_pen_em_flat,
           file = "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/correltion_matrix_pen_em_flat.csv",
           row.names = FALSE)
 
 
-
-
-# #################################################################################
-# ### correlation options - 3
-# ##################################################################################
-# chart.Correlation(for_Pen_correlation, histogram=TRUE, pch=19)
-
-
-
-#################################################################################
-### Plots
-##################################################################################
 names(Boordaroo)
-#Lets try ... based on the correlation matrix - not that its very good!
-#1. "mean.resistance.value.for.the.profile" vs "EM05m"  
-#1a. "medium.resistance.value.for.the.profile"                             
-  
-#2. "total" vs "EM05m"  
-#3. "X0.50" vs "EM05m"
-#4.  "max..Peak..resistance.value.for.the.profile"  vs "EM05m"   
-#5.  "The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm"     
 
+Boordaroo <- Boordaroo %>% select(
+  "max..Peak..resistance.value.up.to.50cm"    ,
+  "location.in.the.profile.of.first.peak..up.to.50cm."   ,
+  "The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.50cm"  ,
+  "Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.50cm.",
+  "X0.50" ,
+  "EM05m" ,                                                              
+  "EM1m"
+)
 
-#1. "mean.resistance.value.for.the.profile" vs "Deep"  
-#2. "X0.50" vs "Deep"  
+Boordaroo <- Boordaroo %>% rename(
+  Peak_Resistance = "max..Peak..resistance.value.up.to.50cm"    , #a
+  Depth_to_peak = "location.in.the.profile.of.first.peak..up.to.50cm."   , #b 
+  Depth_to_2.5MPa ="The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.50cm"  , #c
+  Area_under_curve_to_2.5MPa ="Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.50cm.", #d
+  Area_under_curve_to_50cm ="X0.50" #e
+ )
+
 
 
 ##################################################################################
 ### 1a. 
 ##################################################################################
 
-EMShallowVMean <- ggplot(Boordaroo, aes(x=`EM05m`, y=`mean.resistance.value.for.the.profile`)) + 
+EMShallowVPeak <- ggplot(Boordaroo, aes(x=`EM05m`, y=`Peak_Resistance`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -117,45 +104,23 @@ EMShallowVMean <- ggplot(Boordaroo, aes(x=`EM05m`, y=`mean.resistance.value.for.
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  labs(#title = "Boordaroo EM vs penetrometer ",
-               #subtitle = "",
-               #x = "EM mS/m (Shallow)", 
-               x = "",
-               y = "Mean \nresistance"     )
+  labs( 
+    x = "",
+    y = "Peak \nresistance"     )
 ggsave(
   device = "png",
-  filename = "EMShallowVMean.png",
+  filename = "EMShallowVPeak.png",
   path= "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
 ) 
 
+#################################################################################
+##1b. 
+#################################################################################
 
-# EMShallowVMedium <- ggplot(Boordaroo, aes(x=`EM05m`, y=`medium.resistance.value.for.the.profile`)) + 
-#   geom_point(alpha =0.5, size=0.3)+
-#   theme_bw()+
-#   geom_smooth(method = lm, se = FALSE) +
-#   stat_regline_equation(
-#     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-#     formula = (y ~ x)
-#   ) +
-#   labs(#title = "Boordaroo EM vs penetrometer ",
-#     #subtitle = "",
-#     #x = "EM mS/m (Shallow)", 
-#     x = "",
-#     y = "Medium \nresistance"     )
-
-
-
-
-
-
-
-##################################################################################
-### 2a. "EX25_50" vs "Shallow" 
-##################################################################################
-EM_Shallow_total <- ggplot(Boordaroo, aes(x=`EM05m`, y=`total`)) + 
+EMShallowVDepth_to_peak <- ggplot(Boordaroo, aes(x=`EM05m`, y=`Depth_to_peak`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -163,32 +128,23 @@ EM_Shallow_total <- ggplot(Boordaroo, aes(x=`EM05m`, y=`total`)) +
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  labs(#title = "Boordaroo EM vs penetrometer ",
-       #subtitle = "",
-       x = "",
-       #x = "EM mS/m (depth Shallow)",
-       y = "Area \nprofile"     )
+  labs(
+    x = "",
+    y = "Depth to peak"     )
 ggsave(
   device = "png",
-  filename = "EM_Shallow_profile.png",
+  filename = "EMShallowVDepth_to_peak.png",
   path= "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
 ) 
 
+#################################################################################
+##1c. 
+#################################################################################
 
-
-
-
-
-
-##################################################################################
-### #3a. "X50.72.5" vs "EM05m"  
-##################################################################################
-
-names(Boordaroo)
-EMShallow_AreaX0_50 <- ggplot(Boordaroo, aes(x=`EM05m`, y=`X0.50`)) + 
+EMShallowVDepth_to_2.5MPa <- ggplot(Boordaroo, aes(x=`EM05m`, y=`Depth_to_2.5MPa`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -196,30 +152,23 @@ EMShallow_AreaX0_50 <- ggplot(Boordaroo, aes(x=`EM05m`, y=`X0.50`)) +
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  
-  labs(#title = "Boordaroo EM vs penetrometer ",
-       #subtitle = "",
-       x = "", 
-       #x = "EM mS/m (depth Shallow)", 
-       y = "Area \n0-50cm"     )
+  labs(
+    x = "",
+    y = "Depth to 2.5MPa")
 ggsave(
   device = "png",
-  filename = "EMShallow_Area0_50.png",
+  filename = "Depth_to_2.5MPa.png",
   path= "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
   dpi=600
 ) 
 
+#################################################################################
+##1d. 
+#################################################################################
 
-
-
-##################################################################################
-### #4a. "max..Peak..resistance.value.for.the.profile" vs "EM05m"  
-##################################################################################
-
-names(Boordaroo)
-EMShallow_MaxPeak_profile <- ggplot(Boordaroo, aes(x=`EM05m`, y=`max..Peak..resistance.value.for.the.profile`)) + 
+EMShallowVArea_under_curve_to_2.5MPa <- ggplot(Boordaroo, aes(x=`EM05m`, y=`Area_under_curve_to_2.5MPa`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -227,15 +176,36 @@ EMShallow_MaxPeak_profile <- ggplot(Boordaroo, aes(x=`EM05m`, y=`max..Peak..resi
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  
-  labs(#title = "Boordaroo EM vs penetrometer ",
-    #subtitle = "",
-    x = "", 
-    #x = "EM mS/m (depth EM05m)", 
-    y = "Max \nresistance"     )
+  labs(
+    x = "",
+    y = "Area under curve to 2.5MPa")
 ggsave(
   device = "png",
-  filename = "EMShallow_MaxPeak_profile.png",
+  filename = "Area_under_curve_to_2.5MPa.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##1e. 
+#################################################################################
+
+EMShallowVArea_under_curve_to_50cm <- ggplot(Boordaroo, aes(x=`EM05m`, y=`Area_under_curve_to_50cm`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Area under curve to 50cm")
+ggsave(
+  device = "png",
+  filename = "Area_under_curve_to_50cm.png",
   path= "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
@@ -243,93 +213,26 @@ ggsave(
 ) 
 
 
+EMShallowVPeak
+EMShallowVDepth_to_peak
+EMShallowVDepth_to_2.5MPa
+EMShallowVArea_under_curve_to_2.5MPa
+EMShallowVArea_under_curve_to_50cm
 
 ################################################################################
 
-##################################################################################
-### #5a. "location.in.the.profile.of.first.peak..up.to.50cm." vs "EM05mw"  
-##################################################################################
-
-names(Boordaroo)
-EMShallow_location2_5_top50 <- ggplot(Boordaroo, aes(x=`EM05m`, y=`location.in.the.profile.of.first.peak..up.to.50cm.`)) + 
-  geom_point(alpha =0.5, size=0.3)+
-  theme_bw()+
-  geom_smooth(method = lm, se = FALSE) +
-  stat_regline_equation(
-    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-    formula = (y ~ x)
-  ) +
-  
-  labs(#title = "Boordaroo EM vs penetrometer ",
-    #subtitle = "",
-    x = "", 
-    #x = "EM mS/m (depth Shallow)", 
-    y = "Depth to peak \nup to 50cm"     )
-ggsave(
-  device = "png",
-  filename = "EMShallow_dpeth_to_peak_top50.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/",
-  width=8.62,
-  height = 6.28,
-  dpi=600
-) 
-################################################################################
-
-
-##################################################################################
-### #5a. "The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.75cm" vs "EM05mw"  
-##################################################################################
-
-names(Boordaroo)
-EMShallow_depth_exceeds_2_5 <- ggplot(Boordaroo, aes(x=`EM05m`, y=`The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.70cm`)) + 
-  geom_point(alpha =0.5, size=0.3)+
-  theme_bw()+
-  geom_smooth(method = lm, se = FALSE) +
-  stat_regline_equation(
-    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-    formula = (y ~ x)
-  ) +
-  labs(#title = "Boordaroo EM vs penetrometer ",
-    #subtitle = "",
-    x = "", 
-    #x = "EM mS/m (depth Shallow)", 
-    y = "Depth exceeds\n2.5MPa"     )
-ggsave(
-  device = "png",
-  filename = "EMShallow_depth_exceeds_2_5.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/",
-  width=8.62,
-  height = 6.28,
-  dpi=600
-) 
-################################################################################
-
-
-
-
-
-EMShallowVMean
-EM_Shallow_total
-EMShallow_AreaX0_50
-
-EMShallow_location2_5_top50
-EMShallow_depth_exceeds_2_5
 
 ################################################################################
 ### Group the plots
 
 
-
-
-
-
 EMShallow_plots_Reg <-
   ggarrange(
-    EMShallowVMean,
-    EM_Shallow_total,
-    EMShallow_AreaX0_50,
-    EMShallow_location2_5_top50,
-    EMShallow_depth_exceeds_2_5,
+    EMShallowVPeak,
+    EMShallowVDepth_to_peak,
+    EMShallowVDepth_to_2.5MPa,
+    EMShallowVArea_under_curve_to_2.5MPa,
+    EMShallowVArea_under_curve_to_50cm,
     
     #labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
     ncol = 2,
@@ -347,106 +250,152 @@ EMShallow_plots_Reg_1 <-
 EMShallow_plots_Reg_1
 ggexport(EMShallow_plots_Reg_1, filename = "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/EM_Shallow_plots_Reg.png")
 
+
 ##################################################################################
+### 2a. 
+##################################################################################
+
+EMDeepVPeak <- ggplot(Boordaroo, aes(x=`EM1m`, y=`Peak_Resistance`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Peak \nresistance"     )
+ggsave(
+  device = "png",
+  filename = "EMDeepVPeak.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+
+
+################################################################################
+##2b. 
+#################################################################################
+
+EMDeepVDepth_to_peak <- ggplot(Boordaroo, aes(x=`EM1m`, y=`Depth_to_peak`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Depth to peak"     )
+ggsave(
+  device = "png",
+  filename = "EMDeepVDepth_to_peak.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##2c. 
+#################################################################################
+
+EMDeepVDepth_to_2.5MPa <- ggplot(Boordaroo, aes(x=`EM1m`, y=`Depth_to_2.5MPa`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Depth to 2.5MPa")
+ggsave(
+  device = "png",
+  filename = "EMDeepVSDepth_to_2.5MPa.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##2d. 
+#################################################################################
+
+EMDeepVArea_under_curve_to_2.5MPa <- ggplot(Boordaroo, aes(x=`EM1m`, y=`Area_under_curve_to_2.5MPa`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Area under curve to 2.5MPa")
+ggsave(
+  device = "png",
+  filename = "EMDeepVsArea_under_curve_to_2.5MPa.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##2e. 
+#################################################################################
+
+EMDeepVArea_under_curve_to_50cm <- ggplot(Boordaroo, aes(x=`EM1m`, y=`Area_under_curve_to_50cm`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Area under curve to 50cm")
+ggsave(
+  device = "png",
+  filename = "EMDeepVsArea_under_curve_to_50cm.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+#################################################################################
+#################################################################################
+#################################################################################
+
 ######################################   EM DEEP #################################
 
 
-##################################################################################
-### #1a. "mean.resistance.value.for.the.profile" vs "Deep"  
-##################################################################################
-
-names(Boordaroo)
-EMDeep_mean_resistance <- ggplot(Boordaroo, aes(x=`EM1m`, y=`mean.resistance.value.for.the.profile`)) + 
-  geom_point(alpha =0.5, size=0.3)+
-  theme_bw()+
-  geom_smooth(method = lm, se = FALSE) +
-  stat_regline_equation(
-    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-    formula = (y ~ x)
-  ) +
-  labs(#title = "Boordaroo EM vs penetrometer ",
-    #subtitle = "",
-    x = "", 
-    #x = "EM mS/m (depth Deep)", 
-    y = "Mean\nresistance"     )
-ggsave(
-  device = "png",
-  filename = "EMDeep_mean_resistance.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/",
-  width=8.62,
-  height = 6.28,
-  dpi=600
-) 
-################################################################################
-
-
-##################################################################################
-### #2a. "total" vs "Deep"  
-##################################################################################
-
-names(Boordaroo)
-EMDeep_area_profile <- ggplot(Boordaroo, aes(x=`EM1m`, y=`total`)) + 
-  geom_point(alpha =0.5, size=0.3)+
-  theme_bw()+
-  geom_smooth(method = lm, se = FALSE) +
-  stat_regline_equation(
-    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-    formula = (y ~ x)
-  ) +
-  labs(#title = "Boordaroo EM vs penetrometer ",
-    #subtitle = "",
-    x = "", 
-    #x = "EM mS/m (depth Deep)", 
-    y = "Area\nprofile"     )
-ggsave(
-  device = "png",
-  filename = "EMDeep_area_profile.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/",
-  width=8.62,
-  height = 6.28,
-  dpi=600
-) 
-################################################################################
-##################################################################################
-### #3a. "X0.50" vs "Deep"  
-##################################################################################
-
-names(Boordaroo)
-EMDeep_area_top_50 <- ggplot(Boordaroo, aes(x=`EM1m`, y=`X0.50`)) + 
-  geom_point(alpha =0.5, size=0.3)+
-  theme_bw()+
-  geom_smooth(method = lm, se = FALSE) +
-  stat_regline_equation(
-    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-    formula = (y ~ x)
-  ) +
-  labs(#title = "Boordaroo EM vs penetrometer ",
-    #subtitle = "",
-    x = "", 
-    #x = "EM mS/m (depth Deep)", 
-    y = "Area\ntop 50cm"     )
-ggsave(
-  device = "png",
-  filename = "EMDeep_area_top_50.png",
-  path= "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/",
-  width=8.62,
-  height = 6.28,
-  dpi=600
-) 
-################################################################################
-
-EMDeep_mean_resistance
-EMDeep_area_profile
-EMDeep_area_top_50
-
+EMDeepVPeak
+EMDeepVDepth_to_peak
+EMDeepVDepth_to_2.5MPa
+EMDeepVArea_under_curve_to_2.5MPa
+EMDeepVArea_under_curve_to_50cm
 
 EMDeep_plots_Reg <-
   ggarrange(
-    EMDeep_mean_resistance,
-    EMDeep_area_profile,
-    EMDeep_area_top_50,
+    EMDeepVPeak,
+    EMDeepVDepth_to_peak,
+    EMDeepVDepth_to_2.5MPa,
+    EMDeepVArea_under_curve_to_2.5MPa,
+    EMDeepVArea_under_curve_to_50cm,
+    
+    #labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
     ncol = 2,
-    nrow = 2
+    nrow = 3
   ) 
 
 EMDeep_plots_Reg_1 <-
@@ -458,4 +407,6 @@ EMDeep_plots_Reg_1 <-
     size = 14
   ))
 EMDeep_plots_Reg_1
-ggexport(EMDeep_plots_Reg_1, filename = "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/EM_deep_plots_Reg.png")
+ggexport(EMDeep_plots_Reg_1, filename = "X:/Therese_Jackie/smart_farms/sites/Boordaroo/Analysis/plots_regression/EM_Deep_plots_Reg.png")
+
+

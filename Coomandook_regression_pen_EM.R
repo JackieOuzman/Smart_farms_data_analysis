@@ -39,7 +39,7 @@ Coomandook <- Coomandook %>%
 ### edit the dataset - I am just looking at pen readings 
 ##################################################################################
 for_Pen_correlation <- Coomandook %>% 
-  dplyr::select("X0.25":"Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.72.5cm.") 
+  dplyr::select("X0.25":"Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.50cm.") 
 
 
 for_Pen_EM_correlation <- Coomandook %>% 
@@ -76,24 +76,33 @@ write.csv(correltion_matrix_pen_em_flat,
           row.names = FALSE)
 
 
+Coomandook <- Coomandook %>% select(
+  "max..Peak..resistance.value.up.to.50cm"    ,
+  "location.in.the.profile.of.first.peak..up.to.50cm."   ,
+  "The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.50cm"  ,
+  "Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.50cm.",
+  "X0.50" ,
+  "EM05m" ,                                                              
+  "EM1m"
+)
+
+Coomandook <- Coomandook %>% rename(
+  Peak_Resistance = "max..Peak..resistance.value.up.to.50cm"    , #a
+  Depth_to_peak = "location.in.the.profile.of.first.peak..up.to.50cm."   , #b 
+  Depth_to_2.5MPa ="The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.50cm"  , #c
+  Area_under_curve_to_2.5MPa ="Sum.the.area.of.the.curve.until.2.5MPa.is.first.reached..up.to.50cm.", #d
+  Area_under_curve_to_50cm ="X0.50" #e
+)
 
 
 
-
-#################################################################################
-### Plots
-##################################################################################
-names(Coomandook)
-#Lets try ... based on the correlation matrix - not that its very good!
-  
 
 
 ##################################################################################
 ### 1a. 
 ##################################################################################
 
-names(Coomandook)
-EMShallow_Mean <- ggplot(Coomandook, aes(x=`EM05m`, y=`mean.resistance.value.for.the.profile`)) + 
+EMShallowVPeak <- ggplot(Coomandook, aes(x=`EM05m`, y=`Peak_Resistance`)) + 
   geom_point(alpha =0.5, size=0.3)+
   theme_bw()+
   geom_smooth(method = lm, se = FALSE) +
@@ -101,15 +110,108 @@ EMShallow_Mean <- ggplot(Coomandook, aes(x=`EM05m`, y=`mean.resistance.value.for
     aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
     formula = (y ~ x)
   ) +
-  
-  labs(#title = "Coomandook EM vs penetrometer ",
-    #subtitle = "",
-    x = "", 
-    #x = "EM mS/m (depth Shallow)", 
-    y = "Mean \nresistance"     )
+  labs( 
+    x = "",
+    y = "Peak \nresistance"     )
 ggsave(
   device = "png",
-  filename = "EMShallow_Mean.png",
+  filename = "EMShallowVPeak.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Coomandook/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##1b. 
+#################################################################################
+
+EMShallowVDepth_to_peak <- ggplot(Coomandook, aes(x=`EM05m`, y=`Depth_to_peak`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Depth to peak"     )
+ggsave(
+  device = "png",
+  filename = "EMShallowVDepth_to_peak.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Coomandook/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##1c. 
+#################################################################################
+
+EMShallowVDepth_to_2.5MPa <- ggplot(Coomandook, aes(x=`EM05m`, y=`Depth_to_2.5MPa`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Depth to 2.5MPa")
+ggsave(
+  device = "png",
+  filename = "Depth_to_2.5MPa.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Coomandook/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##1d. 
+#################################################################################
+
+EMShallowVArea_under_curve_to_2.5MPa <- ggplot(Coomandook, aes(x=`EM05m`, y=`Area_under_curve_to_2.5MPa`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Area under curve to 2.5MPa")
+ggsave(
+  device = "png",
+  filename = "Area_under_curve_to_2.5MPa.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Coomandook/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##1e. 
+#################################################################################
+
+EMShallowVArea_under_curve_to_50cm <- ggplot(Coomandook, aes(x=`EM05m`, y=`Area_under_curve_to_50cm`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Area under curve to 50cm")
+ggsave(
+  device = "png",
+  filename = "Area_under_curve_to_50cm.png",
   path= "X:/Therese_Jackie/smart_farms/sites/Coomandook/Analysis/plots_regression/",
   width=8.62,
   height = 6.28,
@@ -117,101 +219,203 @@ ggsave(
 ) 
 
 
-EMShallow_Area_profile <- ggplot(Coomandook, aes(x=`EM05m`, y=`total`)) + 
-  geom_point(alpha =0.5, size=0.3)+
-  theme_bw()+
-  geom_smooth(method = lm, se = FALSE) +
-  stat_regline_equation(
-    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-    formula = (y ~ x)
-  ) +
-  
-  labs(#title = "Coomandook EM vs penetrometer ",
-    #subtitle = "",
-    x = "", 
-    #x = "EM mS/m (depth Shallow)", 
-    y = "Area \nprofile"     )
+EMShallowVPeak
+EMShallowVDepth_to_peak
+EMShallowVDepth_to_2.5MPa
+EMShallowVArea_under_curve_to_2.5MPa
+EMShallowVArea_under_curve_to_50cm
 
-EMShallow_Area_0_50 <- ggplot(Coomandook, aes(x=`EM05m`, y=`X0.50`)) + 
-  geom_point(alpha =0.5, size=0.3)+
-  theme_bw()+
-  geom_smooth(method = lm, se = FALSE) +
-  stat_regline_equation(
-    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-    formula = (y ~ x)
-  ) +
-  
-  labs(#title = "Coomandook EM vs penetrometer ",
-    #subtitle = "",
-    x = "", 
-    #x = "EM mS/m (depth Shallow)", 
-    y = "Area \n0-50cm"     )
+################################################################################
 
-EMShallow_Depth_peak <- ggplot(Coomandook, aes(x=`EM05m`, y=`location.in.the.profile.of.first.peak..up.to.50cm.`)) + 
-  geom_point(alpha =0.5, size=0.3)+
-  theme_bw()+
-  geom_smooth(method = lm, se = FALSE) +
-  stat_regline_equation(
-    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-    formula = (y ~ x)
-  ) +
-  
-  labs(#title = "Coomandook EM vs penetrometer ",
-    #subtitle = "",
-    x = "", 
-    #x = "EM mS/m (depth Shallow)", 
-    y = "Depth to peak \nup to 50cm"     )
 
-EMShallow_Depth_exceeds <- ggplot(Coomandook, aes(x=`EM05m`, y=`The.depth.when.resistance.first.exceeds.2.5MPa.to.depth.of.72.5cm`)) + 
-  geom_point(alpha =0.5, size=0.3)+
-  theme_bw()+
-  geom_smooth(method = lm, se = FALSE) +
-  stat_regline_equation(
-    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
-    formula = (y ~ x)
-  ) +
-  
-  labs(#title = "Coomandook EM vs penetrometer ",
-    #subtitle = "",
-    x = "", 
-    #x = "EM mS/m (depth Shallow)", 
-    y = "Depth exceeds \n2.5MPa"     )
-
-EMShallow_Mean
-EMShallow_Area_profile
-EMShallow_Area_0_50
-EMShallow_Depth_peak
-EMShallow_Depth_exceeds
 ################################################################################
 ### Group the plots
 
 
-
-
-
-
-Eca_plots_Reg <-
+EMShallow_plots_Reg <-
   ggarrange(
-    EMShallow_Mean,
-    EMShallow_Area_profile,
-    EMShallow_Area_0_50,
-    EMShallow_Depth_peak,
-    EMShallow_Depth_exceeds,
+    EMShallowVPeak,
+    EMShallowVDepth_to_peak,
+    EMShallowVDepth_to_2.5MPa,
+    EMShallowVArea_under_curve_to_2.5MPa,
+    EMShallowVArea_under_curve_to_50cm,
     
-    
-    #labels = c("ECa 1", "ECa 2", "ECa 3", "ECa 4"),
+    #labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
     ncol = 2,
     nrow = 3
   ) 
 
-Eca_plots_Reg_Reg_1 <-
-  annotate_figure(Eca_plots_Reg, top = text_grob(
-    "EM vs Penetrometer. 
+EMShallow_plots_Reg_1 <-
+  annotate_figure(EMShallow_plots_Reg, top = text_grob(
+    "EM38 Shallow vs Penetrometer parameters. 
     Site: Coomandook",
     color = "Black",
     face = "bold",
     size = 14
   ))
-Eca_plots_Reg_Reg_1
-ggexport(Eca_plots_Reg_Reg_1, filename = "X:/Therese_Jackie/smart_farms/sites/Coomandook/Analysis/plots_regression/EM_Shallow_plots_Reg.png")
+EMShallow_plots_Reg_1
+ggexport(EMShallow_plots_Reg_1, filename = "X:/Therese_Jackie/smart_farms/sites/Coomandook/Analysis/plots_regression/EM_Shallow_plots_Reg.png")
+
+
+##################################################################################
+### 2a. 
+##################################################################################
+
+EMDeepVPeak <- ggplot(Coomandook, aes(x=`EM1m`, y=`Peak_Resistance`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Peak \nresistance"     )
+ggsave(
+  device = "png",
+  filename = "EMDeepVPeak.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Coomandook/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+
+
+################################################################################
+##2b. 
+#################################################################################
+
+EMDeepVDepth_to_peak <- ggplot(Coomandook, aes(x=`EM1m`, y=`Depth_to_peak`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Depth to peak"     )
+ggsave(
+  device = "png",
+  filename = "EMDeepVDepth_to_peak.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Coomandook/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##2c. 
+#################################################################################
+
+EMDeepVDepth_to_2.5MPa <- ggplot(Coomandook, aes(x=`EM1m`, y=`Depth_to_2.5MPa`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Depth to 2.5MPa")
+ggsave(
+  device = "png",
+  filename = "EMDeepVSDepth_to_2.5MPa.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Coomandook/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##2d. 
+#################################################################################
+
+EMDeepVArea_under_curve_to_2.5MPa <- ggplot(Coomandook, aes(x=`EM1m`, y=`Area_under_curve_to_2.5MPa`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Area under curve to 2.5MPa")
+ggsave(
+  device = "png",
+  filename = "EMDeepVsArea_under_curve_to_2.5MPa.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Coomandook/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+
+#################################################################################
+##2e. 
+#################################################################################
+
+EMDeepVArea_under_curve_to_50cm <- ggplot(Coomandook, aes(x=`EM1m`, y=`Area_under_curve_to_50cm`)) + 
+  geom_point(alpha =0.5, size=0.3)+
+  theme_bw()+
+  geom_smooth(method = lm, se = FALSE) +
+  stat_regline_equation(
+    aes(label =  paste(..eq.label.., ..rr.label.., sep = "~~~~")),
+    formula = (y ~ x)
+  ) +
+  labs(
+    x = "",
+    y = "Area under curve to 50cm")
+ggsave(
+  device = "png",
+  filename = "EMDeepVsArea_under_curve_to_50cm.png",
+  path= "X:/Therese_Jackie/smart_farms/sites/Coomandook/Analysis/plots_regression/",
+  width=8.62,
+  height = 6.28,
+  dpi=600
+) 
+#################################################################################
+#################################################################################
+#################################################################################
+
+######################################   EM DEEP #################################
+
+
+EMDeepVPeak
+EMDeepVDepth_to_peak
+EMDeepVDepth_to_2.5MPa
+EMDeepVArea_under_curve_to_2.5MPa
+EMDeepVArea_under_curve_to_50cm
+
+EMDeep_plots_Reg <-
+  ggarrange(
+    EMDeepVPeak,
+    EMDeepVDepth_to_peak,
+    EMDeepVDepth_to_2.5MPa,
+    EMDeepVArea_under_curve_to_2.5MPa,
+    EMDeepVArea_under_curve_to_50cm,
+    
+    #labels = c("A", "B", "C", "D", "E", "F", "G", "H"),
+    ncol = 2,
+    nrow = 3
+  ) 
+
+EMDeep_plots_Reg_1 <-
+  annotate_figure(EMDeep_plots_Reg, top = text_grob(
+    "EM38 deep vs Penetrometer parameters. 
+    Site: Coomandook",
+    color = "Black",
+    face = "bold",
+    size = 14
+  ))
+EMDeep_plots_Reg_1
+ggexport(EMDeep_plots_Reg_1, filename = "X:/Therese_Jackie/smart_farms/sites/Coomandook/Analysis/plots_regression/EM_Deep_plots_Reg.png")
+
+
+
+
 

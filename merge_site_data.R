@@ -1,6 +1,6 @@
 ## MERGE THE REGRESSION DATA FOR ALL SITES
 
-
+library(tidyverse)
 
 Coomandook <- read.csv("X:/Therese_Jackie/smart_farms/sites/Coomandook/Coomandook_pen_vs_em_2023.csv", skip=2)
 
@@ -87,6 +87,9 @@ Bute <- Bute %>% mutate(site = "Bute")
 names(Bute)
 names(merge_step3)
 merge_step <- rbind(Boordaroo,Coomandook, Charlies , Walpeup, Bute) ## SITES WITH EM
+str(merge_step)
+merge_step <-merge_step %>% filter(!is.na(Group))
+
 
 write.csv(merge_step,
           file = "X:/Therese_Jackie/smart_farms/sites/merge_step_EM_sites_Pen_all.csv",
